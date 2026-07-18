@@ -28,80 +28,82 @@ using namespace std;
 
 // ========== 你的代码 ==========
 struct Student {
+  Student* next;
+  int score;
   int id;
   string name;
-  int score;
-  Student* next;
   Student() : id(0), name(""), score(0), next(nullptr) {}
   Student(int i, string n, int s) : id(i), name(n), score(s), next(nullptr) {}
 };
 
 class ScoreList {
  private:
-  Student* stu;
+  Student* head;
 
  public:
-  ScoreList() : stu(nullptr) {}
+  ScoreList() : head(nullptr) {}
   void insertSorted(int i, string n, int s) {
     Student* node = new Student(i, n, s);
-    Student* cur = stu;
+    Student* cur = head;
     Student* pre = nullptr;
-
-    if (cur == nullptr) {
-      stu = node;
-      return;
-    }
 
     while (cur != nullptr && cur->score > s) {
       pre = cur;
       cur = cur->next;
     }
 
+    node->next = cur;
     if (pre == nullptr) {
-      node->next = stu;
-      stu = node;
+      head = node;
     } else {
       pre->next = node;
-      node->next = cur;
     }
   }
 
   void print() {
-    Student* p = stu;
-    while (p) {
-      cout << p->id << " " << p->name << " " << p->score << endl;
-      p = p->next;
+    Student* cur = head;
+
+    while (cur != nullptr) {
+      cout << cur->id << " " << cur->name << " " << cur->score << endl;
+      cur = cur->next;
     }
   }
 
   void removeFailed() {
-    Student* p1 = stu;
-    Student* p2 = nullptr;
+    Student* pre = nullptr;
+    Student* cur = head;
 
-    while (p1) {
-      if (p1->score < 60) {
-        if (p2 == nullptr) {
-          stu = p1->next;
-          delete p1;
-          p1 = stu;
-        } else {
-          p2->next = p1->next;
-          delete p1;
-          p1 = p2->next;
-        }
-      } else {
-        p2 = p1;
-        p1 = p1->next;
-      }
+    while (cur != nullptr && cur->score >= 60) {
+      pre = cur;
+      cur = cur->next;
+    }
+
+    if (cur == nullptr) {
+      return;
+    }
+
+    if (pre == nullptr) {
+      head = nullptr;
+    } else {
+      pre->next = nullptr;
+    }
+    Student* temp;
+
+    while (cur != nullptr) {
+      temp = cur;
+      cur = cur->next;
+      delete temp;
     }
   }
 
   ~ScoreList() {
-    Student* p1 = stu;
-    while (p1) {
-      Student* temp = p1;
-      p1 = p1->next;
-      delete temp;
+    Student* pre = nullptr;
+    Student* cur = head;
+
+    while (cur != nullptr) {
+      pre = cur;
+      cur = cur->next;
+      delete pre;
     }
   }
 };
